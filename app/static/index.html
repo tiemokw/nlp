@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>EOT Lab · 25 Szenarien, zwei Stimmen</title>
+    <link rel="stylesheet" href="/app.css" />
+    <script type="module" src="/main.js"></script>
+  </head>
+  <body>
+    <aside>
+      <a class="brand" href="/"
+        >eot<span>lab</span><small>SPRACHE · PAUSE · GESPRÄCH</small></a
+      >
+      <nav aria-label="Arbeitsbereiche">
+        <button data-tab="study" class="active">
+          01 <span>Datensatz</span>
+        </button>
+        <button data-tab="record">02 <span>Selbst aufnehmen</span></button>
+        <button data-tab="generate">03 <span>ElevenLabs</span></button>
+        <button data-tab="annotate">04 <span>Referenzenden</span></button>
+        <button data-tab="compare">05 <span>Evaluation starten</span></button>
+        <button data-tab="evaluations">06 <span>Ergebnisse</span></button>
+      </nav>
+      <div class="aside-note"><span class="status-dot"></span>Lokal</div>
+    </aside>
+    <main>
+      <header>
+        <div>
+          <p class="eyebrow">END-OF-TURN DETECTION</p>
+          <h1 id="page-title">Datensatz</h1>
+        </div>
+        <div id="overview" class="overview"></div>
+      </header>
+      <div id="notice" class="notice notice-banner" role="status" hidden>
+        <span id="notice-message"></span
+        ><button
+          type="button"
+          id="notice-dismiss"
+          class="quiet"
+          aria-label="Hinweis schließen"
+        >
+          ×
+        </button>
+      </div>
+      <section id="study" class="tab">
+        <div id="study-stats" class="study-stats" aria-live="polite"></div>
+        <div class="panel">
+          <div class="panel-heading">
+            <div class="section-title">
+              <h2>Szenarien</h2>
+              <button
+                type="button"
+                class="info-trigger"
+                data-info-topic="study-design"
+                aria-label="Informationen zum Versuchsaufbau"
+              >
+                <span aria-hidden="true">i</span>
+              </button>
+            </div>
+            <span class="muted small">25 Paare</span>
+          </div>
+          <label class="full" id="study-source-field" hidden
+            >Synthetische Aufnahmen<select id="study-synthetic-release"></select
+          ></label>
+          <div class="table-wrap">
+            <table class="study-pair-table">
+              <thead>
+                <tr>
+                  <th>Szenario</th>
+                  <th>Sprechverlauf</th>
+                  <th>Eigenaufnahme</th>
+                  <th>ElevenLabs</th>
+                </tr>
+              </thead>
+              <tbody id="study-pairs"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-heading">
+            <div class="section-title">
+              <h2>Export</h2>
+              <button
+                type="button"
+                class="info-trigger"
+                data-info-topic="dataset"
+                aria-label="Informationen zum Datensatzexport"
+              >
+                <span aria-hidden="true">i</span>
+              </button>
+            </div>
+          </div>
+          <p id="study-release-status" role="status"></p>
+          <button id="study-release" class="primary" disabled>
+            Datensatz abschließen
+          </button>
+          <div id="study-releases"></div>
+        </div>
+      </section>
+      <section id="generate" class="tab" hidden>
+        <div class="panel">
+          <div class="panel-heading">
+            <div class="section-title">
+              <h2>Aufnahmen erzeugen</h2>
+              <button
+                type="button"
+                class="info-trigger"
+                data-info-topic="generation"
+                aria-label="Informationen zur Datenerzeugung"
+                title="Informationen zur Datenerzeugung"
+              >
+                <span aria-hidden="true">i</span>
+              </button>
+            </div>
+            <span class="badge">ElevenLabs</span>
+          </div>
+          <div id="synthesis-status" class="connection-status">
+            Verbindung wird geprüft …
+          </div>
+          <div class="actions">
+            <button id="synthesis-connect">Stimmen laden</button>
+          </div>
+          <input id="synthesis-size" type="hidden" value="study25" />
+          <div id="synthesis-voices" class="form-grid"></div>
+          <label class="checkbox" id="synthesis-gender-confirmation" hidden
+            ><input id="synthesis-female-confirmed" type="checkbox" /> Die
+            gewählte Stimme ist weiblich und für Deutsch geeignet. Das
+            Geschlecht ist beim Anbieter nicht hinterlegt.</label
+          >
+          <details class="advanced-options">
+            <summary>Weitere Einstellungen</summary>
+            <div class="form-grid">
+              <label
+                >Sprachmodell<select id="synthesis-model">
+                  <option value="eleven_multilingual_v2">
+                    Eleven Multilingual v2
+                  </option>
+                  <option value="eleven_flash_v2_5">Eleven Flash v2.5</option>
+                </select></label
+              ><label
+                >Seed<input
+                  id="synthesis-seed"
+                  type="number"
+                  min="0"
+                  max="4294967295"
+                  value="42"
+              /></label>
+            </div>
+          </details>
+          <div class="actions">
+            <button id="synthesis-preview">Vorschau berechnen</button
+            ><button id="synthesis-start" class="primary" disabled>
+              25 Aufnahmen erzeugen
+            </button>
+          </div>
+          <div class="cost-note">
+            Nutzt ElevenLabs-Kontingent
+            <button
+              type="button"
+              class="info-trigger"
+              data-info-topic="costs"
+              aria-label="Kosten und Cache"
+              title="Kosten und Cache"
+            >
+              <span aria-hidden="true">i</span>
+            </button>
+          </div>
+          <div id="synthesis-plan"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-heading">
+            <div class="section-title">
+              <h2>Sprechvorlagen</h2>
+              <button
+                type="button"
+                class="info-trigger"
+                data-info-topic="pause-construction"
+                aria-label="Wie entstehen die Pausen?"
+                title="Wie entstehen die Pausen?"
+              >
+                <span aria-hidden="true">i</span>
+              </button>
+            </div>
+          </div>
+          <details>
+            <summary>Alle Texte und Pausen ansehen</summary>
+            <div id="synthesis-templates"></div>
+          </details>
+        </div>
+        <div class="panel">
+          <h2>Generierungen</h2>
+          <div id="synthesis-jobs"></div>
+          <div id="synthesis-clips"></div>
+        </div>
+      </section>
+      <section id="record" class="tab" hidden>
+        <div class="toolbar">
+          <label
+            >Stimmquelle
+            <select id="person"></select
+          ></label>
+          <div id="person-progress"></div>
+          <button id="edit-person" class="quiet">Person bearbeiten</button>
+        </div>
+        <div class="record-grid">
+          <div class="panel card-panel">
+            <div class="panel-heading">
+              <span class="eyebrow">AUFNAHMEKARTE</span
+              ><span id="card-id" class="mono"></span>
+            </div>
+            <label class="full"
+              >Aufgabe auswählen<select id="scenario"></select
+            ></label>
+            <div id="scenario-card"></div>
+          </div>
+          <div class="panel recorder-panel">
+            <div class="panel-heading">
+              <span class="eyebrow">AUFNAHME</span
+              ><span id="record-state" class="badge">Bereit</span>
+            </div>
+            <div class="record-orbit">
+              <span id="record-time">00:00</span
+              ><small id="record-hint">Mikrofonfreigabe beim Start</small>
+            </div>
+            <div class="meter" aria-label="Mikrofonpegel">
+              <div id="level"></div>
+            </div>
+            <div class="actions">
+              <button id="start-record" class="primary">
+                ● Aufnahme starten</button
+              ><button id="finish-record" hidden>Beitrag fertig</button
+              ><button id="abort-record" class="quiet" hidden>Abbrechen</button>
+            </div>
+            <div id="pause-coach" hidden>
+              <button id="pause-coach-start" class="quiet" type="button">
+                Pausentimer starten</button
+              ><span
+                id="pause-coach-status"
+                role="status"
+                aria-live="polite"
+              ></span>
+            </div>
+            <div id="record-review" hidden>
+              <audio id="record-audio" controls></audio>
+              <a id="local-download" download="aufnahme.wav"
+                >Sicherung herunterladen</a
+              >
+              <div class="actions">
+                <button id="save-record" class="primary">
+                  Speichern & übernehmen</button
+                ><button id="retry-record" class="quiet">Neu aufnehmen</button>
+              </div>
+              <p id="upload-note" class="small"></p>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-heading">
+            <h2>Bisherige Versuche</h2>
+            <span class="muted">Originale bleiben erhalten</span>
+          </div>
+          <div id="attempt-list" class="attempt-list"></div>
+        </div>
+      </section>
+      <section id="annotate" class="tab" hidden>
+        <div class="panel">
+          <div class="panel-heading">
+            <div class="section-title">
+              <h2>Gold-Ende markieren</h2>
+              <button
+                type="button"
+                class="info-trigger"
+                data-info-topic="annotation"
+                aria-label="Informationen zur Annotation"
+              >
+                <span aria-hidden="true">i</span>
+              </button>
+            </div>
+          </div>
+          <label class="full"
+            >Aufnahme<select id="annotation-attempt"></select
+          ></label>
+          <p id="annotation-empty" class="muted" hidden>
+            Noch keine Studienaufnahmen vorhanden. Nimm zuerst ein Beispiel auf
+            oder erzeuge die ElevenLabs-Dateien.
+          </p>
+          <div id="annotation-editor" hidden>
+            <p id="annotation-info" class="muted"></p>
+            <canvas
+              id="waveform"
+              height="160"
+              aria-label="Wellenform: klicken setzt die Abspielposition"
+            ></canvas>
+            <div class="annotation-controls">
+              <div class="annotation-playback">
+                <audio id="annotation-audio" controls></audio
+                ><label
+                  >Tempo<select id="playback-rate">
+                    <option value="1">1×</option>
+                    <option value="0.75">0,75×</option>
+                    <option value="0.5">0,5×</option>
+                  </select></label
+                ><label
+                  >Zoom<select id="wave-zoom">
+                    <option value="1">Gesamt</option>
+                    <option value="2">2×</option>
+                    <option value="4">4×</option>
+                    <option value="8">8×</option>
+                  </select></label
+                >
+              </div>
+              <div id="wave-navigation" class="wave-navigation" hidden>
+                <input
+                  id="wave-offset"
+                  type="range"
+                  min="0"
+                  max="0"
+                  value="0"
+                  step="0.01"
+                  aria-label="Wellenformausschnitt verschieben"
+                />
+              </div>
+              <div class="annotation-mark">
+                <button id="mark-gold">
+                  <svg
+                    viewBox="0 0 20 20"
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    aria-hidden="true"
+                  >
+                    <path d="M5 17V3h10l-2 4 2 4H5" /></svg
+                  >Abspielposition als Gold-Ende
+                </button>
+                <output id="gold-end" class="muted" aria-live="polite"></output>
+              </div>
+            </div>
+            <label class="full"
+              >Transkript<textarea
+                id="transcript"
+                rows="2"
+                placeholder="Was tatsächlich gesagt wurde"
+              ></textarea>
+            </label>
+            <div class="actions">
+              <button id="save-annotation" class="primary">Speichern</button
+              ><button id="annotation-next">
+                Speichern & nächstes offenes Ende</button
+              ><span id="annotation-status" class="muted"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="compare" class="tab" hidden>
+        <div class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">01 · Datengrundlage</p>
+              <div class="section-title">
+                <h2>Datensatz</h2>
+                <button
+                  type="button"
+                  class="info-trigger"
+                  data-info-topic="dataset"
+                  aria-label="Informationen zum Datensatz"
+                  title="Informationen zum Datensatz"
+                >
+                  <span aria-hidden="true">i</span>
+                </button>
+              </div>
+            </div>
+            <span class="badge">Unveränderlicher Stand</span>
+          </div>
+          <div class="full">
+            <label>Datensatz<select id="run-release"></select></label>
+          </div>
+          <details>
+            <summary>Datensatz-Exporte</summary>
+            <div id="releases"></div>
+            <p class="small muted">
+              Den gemeinsamen Studienstand mit 50 Dateien erstellst du unter
+              „Datensatz“. Ältere Pilotdaten bleiben hier verfügbar.
+            </p>
+          </details>
+        </div>
+        <div class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">02 · Verfahren</p>
+              <h2>Modelle</h2>
+            </div>
+            <button id="model-refresh" class="quiet">
+              Status aktualisieren
+            </button>
+          </div>
+          <div id="model-options" class="model-grid"></div>
+          <div class="settings-strip">
+            <div>
+              <strong>Messbedingungen</strong>
+              <p id="settings-summary" class="small muted"></p>
+            </div>
+            <button type="button" data-open-settings="shared" class="quiet">
+              Anpassen
+            </button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">03 · Evaluation</p>
+              <div class="section-title">
+                <h2>Starten</h2>
+                <button
+                  type="button"
+                  class="info-trigger"
+                  data-info-topic="evaluation"
+                  aria-label="Informationen zum Evaluationslauf"
+                  title="Informationen zum Evaluationslauf"
+                >
+                  <span aria-hidden="true">i</span>
+                </button>
+              </div>
+            </div>
+            <span class="muted small">Bis zu 6 Aufnahmen parallel</span>
+          </div>
+          <label class="full"
+            >Name der Evaluation<input
+              id="run-name"
+              maxlength="120"
+              placeholder="z. B. Pilot · lange Pausen · Standardschwellen"
+              autocomplete="off"
+          /></label>
+          <div class="actions">
+            <button id="run-start" class="primary">Evaluation starten</button>
+          </div>
+        </div>
+      </section>
+      <section id="evaluations" class="tab" hidden>
+        <div class="library-heading">
+          <button class="quiet" data-open-comparison>Läufe kombinieren</button>
+          <button class="primary" data-new-evaluation>Neue Evaluation</button>
+        </div>
+        <div id="evaluation-stats" class="library-stats"></div>
+        <div class="panel evaluation-library">
+          <div class="library-filters">
+            <label
+              >Suche<input
+                id="evaluation-search"
+                type="search"
+                placeholder="Name oder Modell suchen …" /></label
+            ><label
+              >Status<select id="evaluation-status">
+                <option value="">Alle Status</option>
+                <option value="completed">Abgeschlossen</option>
+                <option value="running">Läuft</option>
+                <option value="queued">Eingereiht</option>
+                <option value="failed">Fehlgeschlagen</option>
+                <option value="interrupted">Unterbrochen</option>
+                <option value="cancelled">Abgebrochen</option>
+              </select></label
+            ><label
+              >Modell<select id="evaluation-model">
+                <option value="">Alle Modelle</option>
+                <option value="baseline">Silero VAD</option>
+                <option value="livekit">LiveKit</option>
+                <option value="scribe">Scribe v3 Live</option>
+              </select></label
+            >
+          </div>
+          <div class="library-list-heading">
+            <span id="evaluation-count" class="small muted"></span
+            ><button id="evaluation-refresh" class="quiet">
+              Aktualisieren
+            </button>
+          </div>
+          <div id="evaluation-list" aria-live="polite"></div>
+        </div>
+      </section>
+      <section id="evaluation-detail" class="tab" hidden>
+        <button type="button" id="back-evaluations" class="quiet back-link">
+          ← Alle Evaluationen
+        </button>
+        <div id="evaluation-detail-content"></div>
+      </section>
+      <section id="comparison" class="tab" hidden>
+        <button type="button" class="quiet back-link" data-comparison-back>← Alle Evaluationen</button>
+        <div class="panel comparison-builder">
+          <div class="panel-heading"><div><h2>Läufe kombinieren</h2><p class="small muted">Für jede Modellzeile einen Lauf wählen.</p></div></div>
+          <form id="comparison-form">
+            <div id="comparison-rows"></div>
+            <div class="comparison-actions">
+              <button type="button" id="comparison-add" class="quiet">+ Modellzeile</button>
+              <button type="submit" id="comparison-apply" class="primary">Vergleich anzeigen</button>
+              <a id="comparison-link" class="small" hidden>Link zu dieser Auswahl</a>
+            </div>
+            <p id="comparison-error" class="notice error" role="alert" hidden></p>
+          </form>
+        </div>
+        <div id="comparison-result"></div>
+      </section>
+      <footer>
+        EOT Lab · Deutschsprachige Voicebot-Dialoge · Forschungsprototyp
+      </footer>
+    </main>
+    <dialog
+      id="model-settings"
+      aria-labelledby="model-settings-title"
+      aria-describedby="model-settings-description"
+    >
+      <form id="model-settings-form" novalidate>
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">Versuchsaufbau</p>
+            <div class="section-title">
+              <h2 id="model-settings-title">Modelleinstellungen</h2>
+              <button
+                type="button"
+                class="info-trigger"
+                data-info-topic="settings"
+                aria-label="Informationen zu den Einstellungen"
+                title="Informationen zu den Einstellungen"
+              >
+                <span aria-hidden="true">i</span>
+              </button>
+            </div>
+          </div>
+          <button
+            type="button"
+            id="settings-close"
+            class="quiet"
+            aria-label="Einstellungen schließen"
+          >
+            ✕
+          </button>
+        </div>
+        <p id="model-settings-description" class="sr-only">
+          Empfohlene Startwerte sind vorbelegt. Änderungen gelten für den
+          nächsten Lauf; bestehende Ergebnisse behalten ihre Konfiguration.
+        </p>
+        <div
+          class="settings-tabs"
+          role="tablist"
+          aria-label="Einstellungsbereiche"
+        >
+          <button
+            type="button"
+            role="tab"
+            id="tab-baseline"
+            aria-controls="settings-baseline"
+            data-settings-tab="baseline"
+          >
+            Silero-Baseline
+          </button>
+          <button
+            type="button"
+            role="tab"
+            id="tab-livekit"
+            aria-controls="settings-livekit"
+            data-settings-tab="livekit"
+          >
+            LiveKit
+          </button>
+          <button
+            type="button"
+            role="tab"
+            id="tab-scribe"
+            aria-controls="settings-scribe"
+            data-settings-tab="scribe"
+          >
+            Scribe v3 Live
+          </button>
+          <button
+            type="button"
+            role="tab"
+            id="tab-shared"
+            aria-controls="settings-shared"
+            data-settings-tab="shared"
+          >
+            Messbedingungen
+          </button>
+        </div>
+        <section
+          id="settings-baseline"
+          role="tabpanel"
+          aria-labelledby="tab-baseline"
+        >
+          <div class="section-title">
+            <h3>Silero VAD + Stille-Timeout</h3>
+            <button
+              type="button"
+              class="info-trigger"
+              data-info-topic="model-baseline"
+              aria-label="Silero VAD + Stille-Timeout: Informationen"
+              title="Silero VAD + Stille-Timeout: Informationen"
+            >
+              <span aria-hidden="true">i</span>
+            </button>
+          </div>
+
+          <label
+            >Stille-Timeouts in Millisekunden<input
+              id="timeouts"
+              value="500,1000,1500"
+              required
+              pattern="[0-9 ,]+"
+          /></label>
+        </section>
+        <section
+          id="settings-livekit"
+          role="tabpanel"
+          aria-labelledby="tab-livekit"
+          hidden
+        >
+          <div class="section-title">
+            <h3>LiveKit Audio Turn Detector</h3>
+            <button
+              type="button"
+              class="info-trigger"
+              data-info-topic="model-livekit"
+              aria-label="LiveKit Audio Turn Detector: Informationen"
+              title="LiveKit Audio Turn Detector: Informationen"
+            >
+              <span aria-hidden="true">i</span>
+            </button>
+          </div>
+          <label
+            >Modellvariante<select id="livekit-version">
+              <option value="v1">v1 · Cloud (empfohlen)</option>
+              <option value="v1-mini">v1-mini · lokal</option>
+            </select></label
+          >
+          <label class="checkbox"
+            ><input id="livekit-auto" type="checkbox" checked />Automatische
+            Schwelle (Deutsch)</label
+          >
+          <label
+            >Eigene EOT-Schwelle<input
+              id="livekit-threshold"
+              type="number"
+              min="0.001"
+              max="0.999"
+              step="0.001"
+              value="0.5"
+              disabled
+              required
+          /></label>
+        </section>
+        <section
+          id="settings-scribe"
+          role="tabpanel"
+          aria-labelledby="tab-scribe"
+          hidden
+        >
+          <div class="section-title">
+            <h3>ElevenLabs Scribe v3 Live</h3>
+            <button
+              type="button"
+              class="info-trigger"
+              data-info-topic="model-scribe"
+              aria-label="ElevenLabs Scribe v3 Live: Informationen"
+              title="ElevenLabs Scribe v3 Live: Informationen"
+            >
+              <span aria-hidden="true">i</span>
+            </button>
+          </div>
+          <label
+            >Turn-Wahrscheinlichkeit für Abschluss<input
+              id="scribe-threshold"
+              type="number"
+              min="0.001"
+              max="0.999"
+              step="0.001"
+              value="0.9"
+              required
+          /></label>
+        </section>
+        <section
+          id="settings-shared"
+          role="tabpanel"
+          aria-labelledby="tab-shared"
+          hidden
+        >
+          <div class="section-title">
+            <h3>Gemeinsame Messbedingungen</h3>
+            <button
+              type="button"
+              class="info-trigger"
+              data-info-topic="model-shared"
+              aria-label="Gemeinsame Messbedingungen: Informationen"
+              title="Gemeinsame Messbedingungen: Informationen"
+            >
+              <span aria-hidden="true">i</span>
+            </button>
+          </div>
+
+          <div class="form-grid dialog-grid">
+            <label
+              >Silero-VAD-Schwelle<input
+                id="vad-threshold"
+                type="number"
+                min="0.001"
+                max="0.999"
+                step="0.001"
+                value="0.5"
+                required
+            /></label>
+            <label
+              >Prüfintervall (ms)<input
+                id="inference-interval"
+                type="number"
+                min="50"
+                max="1000"
+                step="1"
+                value="100"
+                required
+            /></label>
+            <label
+              >Erste Prüfung nach Stille (ms)<input
+                id="min-silence"
+                type="number"
+                min="250"
+                max="1500"
+                step="1"
+                value="300"
+                required
+            /></label>
+            <label
+              >Maximale Stille / Timer-Fallback (ms)<input
+                id="max-silence"
+                type="number"
+                min="1500"
+                max="5000"
+                step="1"
+                value="5000"
+                required
+            /></label>
+          </div>
+        </section>
+        <p id="settings-error" class="notice error" role="alert" hidden></p>
+        <div class="dialog-footer">
+          <button type="button" id="settings-reset" class="quiet">
+            Startwerte wiederherstellen
+          </button>
+          <div class="actions">
+            <button type="button" id="settings-cancel" class="quiet">
+              Abbrechen</button
+            ><button id="settings-save" type="submit" class="primary">
+              Übernehmen
+            </button>
+          </div>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="rename-evaluation" aria-labelledby="rename-evaluation-title">
+      <form id="rename-evaluation-form">
+        <p class="eyebrow">Organisation</p>
+        <div class="section-title">
+          <h2 id="rename-evaluation-title">Umbenennen</h2>
+          <button
+            type="button"
+            class="info-trigger"
+            data-info-topic="rename"
+            aria-label="Informationen zum Namen"
+            title="Informationen zum Namen"
+          >
+            <span aria-hidden="true">i</span>
+          </button>
+        </div>
+
+        <label
+          >Name<input
+            id="rename-evaluation-name"
+            minlength="1"
+            maxlength="120"
+            required
+            autocomplete="off"
+        /></label>
+        <p
+          id="rename-evaluation-error"
+          class="notice error"
+          hidden
+          role="alert"
+        ></p>
+        <div class="actions">
+          <button type="submit" id="rename-evaluation-save" class="primary">
+            Namen speichern</button
+          ><button type="button" id="rename-evaluation-cancel" class="quiet">
+            Abbrechen
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="figure-preview" aria-labelledby="figure-preview-title">
+      <div class="dialog-heading">
+        <h2 id="figure-preview-title">Grafik</h2>
+        <button
+          type="button"
+          id="figure-preview-close"
+          class="quiet"
+          aria-label="Grafik schließen"
+        >
+          ✕
+        </button>
+      </div>
+      <div class="figure-preview-scroll">
+        <img id="figure-preview-image" alt="" />
+      </div>
+      <div class="figure-downloads">
+        <a id="figure-preview-png">PNG herunterladen ↓</a
+        ><a id="figure-preview-svg">SVG herunterladen ↓</a>
+      </div>
+    </dialog>
+    <dialog id="info-dialog" aria-labelledby="info-dialog-title">
+      <div class="dialog-heading">
+        <h2 id="info-dialog-title">Informationen</h2>
+        <button
+          type="button"
+          id="info-dialog-close"
+          class="quiet"
+          aria-label="Informationen schließen"
+        >
+          ×
+        </button>
+      </div>
+      <div id="info-dialog-content" class="info-content"></div>
+      <div id="info-dialog-links" class="info-links"></div>
+    </dialog>
+  </body>
+</html>

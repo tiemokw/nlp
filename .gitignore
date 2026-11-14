@@ -1,0 +1,13 @@
+.venv/
+.tools/
+.cache/
+data/
+results/
+models/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.pyc
+.env
+.DS_Store
+~$*
